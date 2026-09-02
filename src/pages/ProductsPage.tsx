@@ -247,7 +247,7 @@ export function ProductsPage() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
                   {filtered.map((product, i) => (
                     <ProductCard
                       key={product.id}
@@ -280,6 +280,8 @@ function FilterContent({
   priceRange,
   priceRanges,
   inStockOnly,
+  branches,
+  branchId,
 }: {
   categories: ReturnType<typeof useCategories>['data'];
   categorySlug: string;
@@ -287,6 +289,8 @@ function FilterContent({
   priceRange: string;
   priceRanges: { label: string; min: number; max: number }[];
   inStockOnly: boolean;
+  branches: ReturnType<typeof useBranches>['data'];
+  branchId: string;
 }) {
   return (
     <div className="space-y-6">
@@ -352,6 +356,33 @@ function FilterContent({
           <span className="text-ink-700">In stock only</span>
         </label>
       </div>
+
+      {branches && branches.length > 0 && (
+        <div>
+          <h3 className="font-heading text-base font-semibold text-ink-900 mb-3">Branch</h3>
+          <div className="space-y-1">
+            <button
+              onClick={() => updateParam('branch', null)}
+              className={`block w-full text-left rounded-lg px-3 py-2 text-sm transition-colors ${
+                !branchId ? 'bg-primary text-white' : 'text-ink-700 hover:bg-cream-200'
+              }`}
+            >
+              All Branches
+            </button>
+            {branches.map((b) => (
+              <button
+                key={b.id}
+                onClick={() => updateParam('branch', b.id)}
+                className={`block w-full text-left rounded-lg px-3 py-2 text-sm transition-colors ${
+                  branchId === b.id ? 'bg-primary text-white' : 'text-ink-700 hover:bg-cream-200'
+                }`}
+              >
+                {b.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
