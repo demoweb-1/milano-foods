@@ -166,17 +166,37 @@ export function HomePage() {
               View All Products <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
-            {featuredProducts.map((product, i) => (
-              <ProductCard
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.08 } },
+            }}
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5"
+          >
+            {featuredProducts.map((product) => (
+              <motion.div
                 key={product.id}
-                product={product}
-                settings={settings}
-                onQuickView={setQuickViewProduct}
-                index={i}
-              />
+                variants={{
+                  hidden: { opacity: 0, y: 30, scale: 0.95 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                  },
+                }}
+              >
+                <ProductCard
+                  product={product}
+                  settings={settings}
+                  onQuickView={setQuickViewProduct}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </Section>
 
