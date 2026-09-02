@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   Star,
@@ -81,22 +81,23 @@ export function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-5">
             {freshBake?.slice(0, 5).map((item, i) => (
               <Reveal key={item.id} delay={i * 0.06}>
-                <div className="card overflow-hidden group h-full">
+                <div className="card overflow-hidden group h-full hover:shadow-lift hover:-translate-y-1 transition-all duration-400 ease-smooth">
                   <div className="relative aspect-square overflow-hidden bg-cream-200">
                     {item.image_url && (
                       <img
                         src={item.image_url}
                         alt={item.name}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-[800ms] ease-smooth group-hover:scale-110"
                       />
                     )}
+                    <div className="shine-sweep" />
                     <div className="absolute top-2.5 right-2.5">
                       <AvailabilityChip status={item.availability} />
                     </div>
                   </div>
                   <div className="p-3.5">
-                    <h3 className="font-heading text-sm sm:text-base font-semibold text-ink-900 leading-snug">
+                    <h3 className="font-heading text-sm sm:text-base font-semibold text-ink-900 leading-snug group-hover:text-primary transition-colors duration-300">
                       {item.name}
                     </h3>
                     {item.stock_note && (
@@ -124,17 +125,18 @@ export function HomePage() {
               <Reveal key={cat.id} delay={i * 0.05}>
                 <Link
                   to={`/products?category=${cat.slug}`}
-                  className="group relative block rounded-2xl overflow-hidden aspect-[4/5] shadow-card hover:shadow-lift transition-all duration-300"
+                  className="group relative block rounded-2xl overflow-hidden aspect-[4/5] shadow-card hover:shadow-lift transition-all duration-400 ease-smooth hover:-translate-y-1"
                 >
                   {cat.image_url && (
                     <img
                       src={cat.image_url}
                       alt={cat.name}
                       loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-[800ms] ease-smooth group-hover:scale-110"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink-900/80 via-ink-900/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink-900/85 via-ink-900/20 to-transparent" />
+                  <div className="shine-sweep" />
                   <div className="absolute bottom-0 left-0 right-0 p-5">
                     <h3 className="font-heading text-lg sm:text-xl font-semibold text-white">
                       {cat.name}
@@ -143,7 +145,7 @@ export function HomePage() {
                       {cat.description}
                     </p>
                     <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-white group-hover:text-gold transition-colors">
-                      Explore <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                      Explore <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1.5 transition-transform duration-300" />
                     </span>
                   </div>
                 </Link>
@@ -367,26 +369,48 @@ function Hero({
   const { add } = useCart();
   const { toast } = useToast();
   const heroImage = 'https://images.pexels.com/photos/32459865/pexels-photo-32459865.jpeg?auto=compress&cs=tinysrgb&h=1200&w=1600';
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+  const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
-    <section className="relative min-h-[88vh] lg:min-h-[92vh] flex items-center overflow-hidden bg-ink-900">
-      {/* Background */}
+    <section
+      ref={heroRef}
+      className="relative min-h-[88vh] lg:min-h-[92vh] flex items-center overflow-hidden bg-ink-900"
+    >
+      {/* Background with parallax */}
       <div className="absolute inset-0">
-        <img
+        <motion.img
           src={heroImage}
           alt="Milano Foods bakery interior"
           className="h-full w-full object-cover"
           fetchPriority="high"
+          style={{ y: imageY, scale: imageScale }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-900/90 via-ink-900/70 to-ink-900/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-900/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-900/92 via-ink-900/70 to-ink-900/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-900/70 via-transparent to-transparent" />
       </div>
 
-      <div className="container-x relative z-10 py-20 lg:py-0">
+      {/* Animated floating orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 right-1/4 h-72 w-72 rounded-full bg-primary/20 blur-[100px] animate-float-slow" />
+        <div className="absolute bottom-1/4 right-1/3 h-64 w-64 rounded-full bg-gold/15 blur-[80px] animate-float-slow" style={{ animationDelay: '4s' }} />
+      </div>
+
+      <motion.div
+        style={{ y: contentY, opacity: contentOpacity }}
+        className="container-x relative z-10 py-20 lg:py-0"
+      >
         <div className="max-w-2xl">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="inline-flex items-center gap-2 chip bg-white/10 backdrop-blur border border-white/20 text-white"
           >
@@ -397,20 +421,37 @@ function Hero({
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
             className="font-heading text-4xl sm:text-5xl lg:text-display-xl text-white font-semibold mt-5 leading-[1.05] text-balance"
           >
-            Akurana's most
-            <br />
-            <span className="text-gold">trusted bakery</span>
+            <span className="block overflow-hidden">
+              <motion.span
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                className="block"
+              >
+                Akurana's most
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden">
+              <motion.span
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="block text-gradient-gold animate-gradient-shift"
+              >
+                trusted bakery
+              </motion.span>
+            </span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="mt-5 text-lg text-cream-200 leading-relaxed max-w-xl"
           >
             Fresh bread, premium cakes, traditional sweets and restaurant meals —
@@ -420,15 +461,16 @@ function Hero({
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="mt-8 flex flex-wrap gap-3"
           >
-            <Link to="/products" className="btn-primary text-base px-7 py-3.5">
-              Order Now <ArrowRight className="h-5 w-5" />
+            <Link to="/products" className="btn-primary text-base px-7 py-3.5 group relative overflow-hidden">
+              <span className="relative z-10 flex items-center gap-2">Order Now <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" /></span>
+              <div className="shine-sweep" />
             </Link>
             <Link
               to="/custom-cakes"
-              className="btn bg-white/10 backdrop-blur border border-white/30 text-white px-7 py-3.5 hover:bg-white/20 active:scale-[0.98]"
+              className="btn bg-white/10 backdrop-blur border border-white/30 text-white px-7 py-3.5 hover:bg-white/20 hover:border-gold/50 active:scale-[0.98] transition-all duration-300"
             >
               <Cake className="h-5 w-5" /> Custom Cakes
             </Link>
@@ -437,7 +479,7 @@ function Hero({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
             className="mt-10 flex items-center gap-6 text-cream-300 text-sm"
           >
             <div className="flex items-center gap-2">
@@ -450,13 +492,13 @@ function Hero({
             </div>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.8 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
         className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:block"
       >
         <div className="flex flex-col items-center gap-2 text-cream-300">
@@ -523,13 +565,14 @@ function CustomCakesSection() {
                     src={type.image}
                     alt={type.name}
                     loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[800ms] ease-smooth group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink-900/80 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink-900/80 via-ink-900/10 to-transparent" />
+                  <div className="shine-sweep" />
                   <span className="absolute bottom-3 left-3 font-heading text-base font-semibold text-white">
                     {type.name}
                   </span>
-                  <ArrowUpRight className="absolute top-3 right-3 h-5 w-5 text-white/70 group-hover:text-gold transition-colors" />
+                  <ArrowUpRight className="absolute top-3 right-3 h-5 w-5 text-white/70 group-hover:text-gold group-hover:scale-125 transition-all duration-300" />
                 </Link>
               </Reveal>
             ))}
@@ -562,8 +605,9 @@ function WhyChooseSection({ yearsOfTrust }: { yearsOfTrust: number }) {
         <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((f, i) => (
             <Reveal key={f.title} delay={i * 0.06}>
-              <div className="card p-6 h-full hover:shadow-lift hover:-translate-y-1 group">
-                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+              <div className="card p-6 h-full hover:shadow-lift hover:-translate-y-1.5 group relative overflow-hidden">
+                <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-primary/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-3 transition-all duration-400 ease-smooth">
                   <f.icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-heading text-lg font-semibold text-ink-900 mt-4">
@@ -591,13 +635,21 @@ function OurStorySection() {
                   src="https://images.pexels.com/photos/7447284/pexels-photo-7447284.jpeg?auto=compress&cs=tinysrgb&h=900&w=720"
                   alt="Milano Foods baker"
                   loading="lazy"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover transition-transform duration-[1200ms] ease-smooth hover:scale-105"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-primary text-white rounded-2xl p-6 shadow-glow max-w-[200px]">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.6, delay: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                className="absolute -bottom-6 -right-6 bg-primary text-white rounded-2xl p-6 shadow-glow max-w-[200px]"
+              >
                 <p className="font-heading text-4xl font-bold">27+</p>
                 <p className="text-sm text-cream-100 mt-1">Years of baking tradition in Akurana</p>
-              </div>
+              </motion.div>
+              {/* Decorative floating element */}
+              <div className="absolute -top-4 -left-4 h-20 w-20 rounded-full border-4 border-gold/30 animate-float-slow hidden lg:block" />
             </div>
           </Reveal>
 
@@ -624,15 +676,17 @@ function OurStorySection() {
                 { label: 'Years', value: '27+' },
                 { label: 'Reviews', value: '1,000+' },
                 { label: 'Products', value: '50+' },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center rounded-2xl bg-cream-100 p-4">
-                  <p className="font-heading text-2xl font-bold text-primary">{stat.value}</p>
-                  <p className="text-xs text-muted mt-1">{stat.label}</p>
-                </div>
+              ].map((stat, i) => (
+                <Reveal key={stat.label} delay={i * 0.08}>
+                  <div className="text-center rounded-2xl bg-cream-100 p-4 hover:bg-cream-200 transition-colors duration-300 group">
+                    <p className="font-heading text-2xl font-bold text-primary group-hover:scale-110 transition-transform duration-300 inline-block">{stat.value}</p>
+                    <p className="text-xs text-muted mt-1">{stat.label}</p>
+                  </div>
+                </Reveal>
               ))}
             </div>
-            <Link to="/about" className="btn-outline mt-8">
-              Read Our Full Story <ArrowRight className="h-4 w-4" />
+            <Link to="/about" className="btn-outline mt-8 group">
+              Read Our Full Story <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
@@ -679,8 +733,8 @@ function ReviewsSection({
         <div className="mt-12 grid md:grid-cols-3 gap-5">
           {reviews?.slice(0, 3).map((review, i) => (
             <Reveal key={review.id} delay={i * 0.08}>
-              <div className="card p-6 h-full flex flex-col">
-                <Quote className="h-8 w-8 text-primary/20 shrink-0" />
+              <div className="card p-6 h-full flex flex-col hover:shadow-lift hover:-translate-y-1 transition-all duration-300 group">
+                <Quote className="h-8 w-8 text-primary/20 shrink-0 group-hover:text-primary/40 transition-colors duration-300" />
                 <p className="text-ink-700 mt-3 leading-relaxed flex-1">"{review.text}"</p>
                 <div className="flex items-center gap-0.5 mt-4">
                   {[1, 2, 3, 4, 5].map((s) => (
@@ -688,7 +742,7 @@ function ReviewsSection({
                   ))}
                 </div>
                 <div className="mt-4 flex items-center gap-3 pt-4 border-t border-cream-300">
-                  <div className="grid h-10 w-10 place-items-center rounded-full bg-primary text-white font-heading font-semibold">
+                  <div className="grid h-10 w-10 place-items-center rounded-full bg-primary text-white font-heading font-semibold group-hover:scale-110 transition-transform duration-300">
                     {review.author_name.charAt(0)}
                   </div>
                   <div>

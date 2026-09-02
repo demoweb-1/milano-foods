@@ -44,7 +44,7 @@ export function Footer() {
                   href={settings.instagram_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-primary transition-colors"
+                  className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-primary hover:scale-110 hover:-translate-y-0.5 transition-all duration-300"
                   aria-label="Instagram"
                 >
                   <Instagram className="h-4.5 w-4.5" />
@@ -55,7 +55,7 @@ export function Footer() {
                   href={settings.facebook_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-primary transition-colors"
+                  className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-primary hover:scale-110 hover:-translate-y-0.5 transition-all duration-300"
                   aria-label="Facebook"
                 >
                   <Facebook className="h-4.5 w-4.5" />
@@ -66,7 +66,7 @@ export function Footer() {
                   href={settings.youtube_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-primary transition-colors"
+                  className="grid h-9 w-9 place-items-center rounded-full bg-white/10 hover:bg-primary hover:scale-110 hover:-translate-y-0.5 transition-all duration-300"
                   aria-label="YouTube"
                 >
                   <Youtube className="h-4.5 w-4.5" />
@@ -91,9 +91,10 @@ export function Footer() {
                 <li key={l.to}>
                   <Link
                     to={l.to}
-                    className="text-cream-300 hover:text-white transition-colors"
+                    className="text-cream-300 hover:text-white transition-colors relative inline-block group"
                   >
                     {l.label}
+                    <span className="absolute left-0 -bottom-0.5 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
                   </Link>
                 </li>
               ))}
@@ -108,9 +109,10 @@ export function Footer() {
                 <li key={c.id}>
                   <Link
                     to={`/products?category=${c.slug}`}
-                    className="text-cream-300 hover:text-white transition-colors"
+                    className="text-cream-300 hover:text-white transition-colors relative inline-block group"
                   >
                     {c.name}
+                    <span className="absolute left-0 -bottom-0.5 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
                   </Link>
                 </li>
               ))}

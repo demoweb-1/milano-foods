@@ -55,8 +55,10 @@ export function Header({ onCartOpen }: { onCartOpen: () => void }) {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ease-smooth ${
-          scrolled ? 'glass shadow-soft' : 'bg-cream/95 backdrop-blur-sm'
+        className={`sticky top-0 z-50 transition-all duration-500 ease-smooth ${
+          scrolled
+            ? 'glass shadow-soft border-b border-white/30'
+            : 'bg-cream/95 backdrop-blur-sm'
         }`}
       >
         <div className="container-x">
@@ -72,14 +74,23 @@ export function Header({ onCartOpen }: { onCartOpen: () => void }) {
                   to={link.to}
                   end={link.to === '/'}
                   className={({ isActive }) =>
-                    `relative px-3.5 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
+                    `group/nav relative px-3.5 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
                       isActive
                         ? 'text-primary'
-                        : 'text-ink-700 hover:text-primary hover:bg-cream-200'
+                        : 'text-ink-700 hover:text-primary'
                     }`
                   }
                 >
-                  {link.label}
+                  {({ isActive }) => (
+                    <>
+                      {link.label}
+                      <span
+                        className={`absolute left-1/2 -bottom-0.5 h-0.5 -translate-x-1/2 rounded-full bg-primary transition-all duration-300 ease-smooth ${
+                          isActive ? 'w-5' : 'w-0 group-hover/nav:w-5'
+                        }`}
+                      />
+                    </>
+                  )}
                 </NavLink>
               ))}
             </nav>
@@ -182,12 +193,12 @@ export function Header({ onCartOpen }: { onCartOpen: () => void }) {
         </div>
 
         {settings?.phone && scrolled === false && (
-          <div className="hidden lg:block border-t border-cream-300 bg-cream-100/60">
-            <div className="container-x flex items-center justify-center gap-2 py-1.5 text-xs text-ink-500">
-              <Phone className="h-3.5 w-3.5" />
+          <div className="hidden lg:block border-t border-cream-300 bg-ink-900 text-cream-300 overflow-hidden">
+            <div className="container-x flex items-center justify-center gap-2 py-1.5 text-xs">
+              <Phone className="h-3.5 w-3.5 text-gold" />
               <span>Call us: {settings.phone}</span>
-              <span className="text-cream-400">•</span>
-              <span>Free delivery on orders above Rs. 3,000 within Akurana</span>
+              <span className="text-gold/40">•</span>
+              <span className="text-cream-400">Free delivery on orders above Rs. 3,000 within Akurana</span>
             </div>
           </div>
         )}

@@ -120,6 +120,11 @@ export default {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
         },
+        'float-slow': {
+          '0%, 100%': { transform: 'translateY(0) translateX(0)' },
+          '33%': { transform: 'translateY(-16px) translateX(8px)' },
+          '66%': { transform: 'translateY(8px) translateX(-6px)' },
+        },
         'slide-down': {
           '0%': { opacity: '0', transform: 'translateY(-100%)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
@@ -128,6 +133,23 @@ export default {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
+        'shine-sweep': {
+          '0%': { transform: 'translateX(-150%) skewX(-12deg)' },
+          '100%': { transform: 'translateX(250%) skewX(-12deg)' },
+        },
+        'gradient-shift': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        'pulse-ring': {
+          '0%': { transform: 'scale(0.8)', opacity: '0.8' },
+          '100%': { transform: 'scale(2)', opacity: '0' },
+        },
+        'bounce-in': {
+          '0%': { opacity: '0', transform: 'scale(0.3) translateY(40px)' },
+          '60%': { opacity: '1', transform: 'scale(1.05) translateY(-4px)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both',
@@ -135,8 +157,13 @@ export default {
         'scale-in': 'scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both',
         'shimmer': 'shimmer 2s linear infinite',
         'float': 'float 6s ease-in-out infinite',
+        'float-slow': 'float-slow 12s ease-in-out infinite',
         'slide-down': 'slide-down 0.3s ease both',
         'marquee': 'marquee 40s linear infinite',
+        'shine-sweep': 'shine-sweep 1.2s cubic-bezier(0.22, 1, 0.36, 1)',
+        'gradient-shift': 'gradient-shift 8s ease infinite',
+        'pulse-ring': 'pulse-ring 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'bounce-in': 'bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both',
       },
       backgroundImage: {
         'grid-pattern': "linear-gradient(to right, rgba(17,17,17,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(17,17,17,0.03) 1px, transparent 1px)",

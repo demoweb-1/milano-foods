@@ -40,15 +40,21 @@ export function SectionHeader({
           transition={{ duration: 0.5 }}
           className="section-eyebrow"
         >
-          <span className="h-px w-6 bg-primary" />
+          <motion.span
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="h-px w-6 bg-primary origin-left inline-block"
+          />
           {eyebrow}
         </motion.span>
       )}
       <motion.h2
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-50px' }}
-        transition={{ duration: 0.5, delay: 0.05 }}
+        transition={{ duration: 0.6, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
         className="heading-lg mt-3 text-balance"
       >
         {title}
@@ -58,7 +64,7 @@ export function SectionHeader({
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           className={`mt-4 text-ink-500 text-lg leading-relaxed ${center ? 'mx-auto' : ''}`}
         >
           {subtitle}
@@ -72,15 +78,16 @@ type RevealProps = {
   children: ReactNode;
   delay?: number;
   className?: string;
+  y?: number;
 };
 
-export function Reveal({ children, delay = 0, className = '' }: RevealProps) {
+export function Reveal({ children, delay = 0, className = '', y = 28 }: RevealProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}

@@ -135,6 +135,64 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Premium gradient text */
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-gold-300 via-gold-400 to-gold-600 bg-clip-text text-transparent;
+    background-size: 200% auto;
+  }
+
+  /* Shine sweep overlay for cards/buttons */
+  .shine-sweep {
+    @apply pointer-events-none absolute inset-0 overflow-hidden;
+  }
+  .shine-sweep::after {
+    content: '';
+    @apply absolute top-0 left-0 h-full w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent;
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  .group:hover .shine-sweep::after {
+    animation: shine-sweep 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Animated gradient border wrapper */
+  .gradient-border {
+    @apply relative rounded-2xl;
+    background: linear-gradient(135deg, var(--tw-gradient-from, #C8102E), var(--tw-gradient-to, #D4AF37));
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+  .gradient-border > * {
+    @apply rounded-[calc(1.25rem-2px)] m-[2px];
+  }
+
+  /* Text mask reveal for headings */
+  .text-reveal {
+    clip-path: inset(0 0 100% 0);
+    animation: text-reveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+  }
+  @keyframes text-reveal {
+    to { clip-path: inset(0 0 0% 0); }
+  }
+
+  /* Magnetic lift hover for interactive cards */
+  .lift-hover {
+    @apply transition-all duration-400 ease-smooth;
+    will-change: transform;
+  }
+  .lift-hover:hover {
+    @apply -translate-y-1.5;
+  }
+
+  /* Premium shimmer loading */
+  .skeleton-premium {
+    @apply bg-gradient-to-r from-cream-200 via-cream-100 to-cream-200 bg-[length:200%_100%] animate-shimmer rounded-lg;
+  }
+}
+
+@keyframes text-reveal {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0% 0); }
 }
 
 @layer utilities {
