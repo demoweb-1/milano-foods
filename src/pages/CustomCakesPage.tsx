@@ -88,6 +88,10 @@ export function CustomCakesPage() {
 
   const onSubmit = async (data: CakeFormValues) => {
     try {
+      const branchNote = data.branch_id
+        ? `Preferred branch: ${branches?.find((b) => b.id === data.branch_id)?.name ?? data.branch_id}`
+        : null;
+
       const { error } = await supabase.from('cake_requests').insert({
         customer_name: data.customer_name,
         customer_email: data.customer_email || null,
@@ -103,8 +107,7 @@ export function CustomCakesPage() {
         collection_date: data.collection_date,
         fulfillment: data.fulfillment,
         delivery_address: data.delivery_address || null,
-        special_instructions: data.special_instructions || null,
-        branch_id: data.branch_id || null,
+        special_instructions: [data.special_instructions, branchNote].filter(Boolean).join('\n') || null,
       });
       if (error) throw error;
       setSubmitted(true);
@@ -116,7 +119,7 @@ export function CustomCakesPage() {
     }
   };
 
-  const pickupBranches = branches?.filter((b) => b.enables_pickup ?? b.enable_pickup) ?? [];
+  const pickupBranches = branches ?? [];
 
   return (
     <>

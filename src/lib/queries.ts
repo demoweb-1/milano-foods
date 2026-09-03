@@ -13,6 +13,8 @@ import type {
   BranchProduct,
   CateringItem,
   Order,
+  Vacancy,
+  JobApplication,
 } from '@/types';
 
 export const queryKeys = {
@@ -31,6 +33,13 @@ export const queryKeys = {
   cateringItems: ['catering-items'] as const,
   order: (id: string) => ['order', id] as const,
   orderByNumber: (num: string) => ['order-by-number', num] as const,
+  vacancies: ['vacancies'] as const,
+  jobApplications: ['job-applications'] as const,
+  jobApplicationsForVacancy: (vacancyId: string) => ['job-applications', vacancyId] as const,
+  branchesAdmin: ['branches-admin'] as const,
+  branchProductsAdmin: (branchId: string) => ['branch-products-admin', branchId] as const,
+  cateringItemsAdmin: ['catering-items-admin'] as const,
+  ordersAdmin: ['orders-admin'] as const,
 };
 
 export function useCategories() {

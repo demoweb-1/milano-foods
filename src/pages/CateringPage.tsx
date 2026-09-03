@@ -11,7 +11,7 @@ import { useToast } from '@/components/ui/Toast';
 import { Section, Reveal } from '@/components/ui/Section';
 import { useBranches, useCateringItems, useSettings } from '@/lib/queries';
 import { formatPrice } from '@/lib/format';
-import type { CateringItem, CateringSelectedItem } from '@/types';
+import type { CateringItem } from '@/types';
 
 const cateringSchema = z.object({
   customer_name: z.string().min(2, 'Please enter your name'),
@@ -102,17 +102,21 @@ export function CateringPage() {
 
   const onSubmit = async (data: CateringFormValues) => {
     try {
-      const itemsPayload: CateringSelectedItem[] = cateringItems
+      const itemsSummary = cateringItems
         ? cateringItems
             .filter((item) => (selectedItems[item.id] ?? 0) > 0)
-            .map((item) => ({
-              item_id: item.id,
-              name: item.name,
-              unit_price: Number(item.unit_price),
-              quantity: selectedItems[item.id],
-              serves: (item.min_serves ?? 10) * selectedItems[item.id],
-            }))
-        : [];
+            .map((item) => `${item.name} ×${selectedItems[item.id]}`)
+            .join(', ')
+        : '';
+
+      const extraNotes = [
+        `Fulfillment: ${data.fulfillment}`,
+        data.branch_id ? `Branch: ${branches?.find((b) => b.id === data.branch_id)?.name ?? data.branch_id}` : null,
+        data.delivery_address ? `Delivery address: ${data.delivery_address}` : null,
+        deliveryLat != null ? `Location: ${deliveryLat.toFixed(4)}, ${deliveryLng?.toFixed(4)}` : null,
+        itemsSummary ? `Selected items: ${itemsSummary}` : null,
+        `Estimated total: ${formatPrice(estimatedTotal, symbol)}`,
+      ].filter(Boolean).join('\n');
 
       const { error } = await supabase.from('catering_requests').insert({
         customer_name: data.customer_name,
@@ -125,14 +129,7 @@ export function CateringPage() {
         service_type: data.service_type,
         menu_preferences: data.menu_preferences || null,
         budget: data.budget || null,
-        special_instructions: data.special_instructions || null,
-        fulfillment: data.fulfillment,
-        branch_id: data.branch_id || null,
-        delivery_address: data.delivery_address || null,
-        delivery_lat: deliveryLat,
-        delivery_lng: deliveryLng,
-        selected_items: itemsPayload,
-        estimated_total: estimatedTotal,
+        special_instructions: [data.special_instructions, extraNotes].filter(Boolean).join('\n\n'),
       });
       if (error) throw error;
       setSubmitted(true);
@@ -144,8 +141,8 @@ export function CateringPage() {
     }
   };
 
-  const pickupBranches = branches?.filter((b) => b.enables_pickup ?? b.enable_pickup) ?? [];
-  const deliveryBranches = branches?.filter((b) => b.enables_delivery ?? b.enable_delivery) ?? [];
+  const pickupBranches = branches ?? [];
+  const deliveryBranches = branches ?? [];
   const hasItems = Object.keys(selectedItems).length > 0;
 
   return (

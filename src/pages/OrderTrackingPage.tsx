@@ -93,8 +93,7 @@ export function OrderTrackingPage() {
       .from('orders')
       .update({
         status: 'cancelled',
-        cancelled_at: new Date().toISOString(),
-        cancel_reason: 'Cancelled by customer',
+        notes: [order.notes, 'CANCELLED BY CUSTOMER'].filter(Boolean).join(' — '),
       })
       .eq('id', order.id);
     setCancelling(false);
@@ -179,7 +178,6 @@ export function OrderTrackingPage() {
             <h1 className="font-heading text-2xl font-semibold text-ink-900">Order Cancelled</h1>
             <p className="mt-3 text-ink-600">
               Your order {order.order_number} has been cancelled.
-              {order.cancel_reason && ` Reason: ${order.cancel_reason}`}
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
               <Link to="/products" className="btn-primary">Browse Products</Link>

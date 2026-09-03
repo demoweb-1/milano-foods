@@ -58,9 +58,8 @@ export function CheckoutPage() {
   const symbol = settings?.currency_symbol ?? 'Rs. ';
 
   const selectedBranch = branches?.find((b) => b.id === selectedBranchId);
-  const branchDeliveryFee = selectedBranch?.delivery_fee != null ? Number(selectedBranch.delivery_fee) : null;
   const deliveryFee = fulfillment === 'delivery'
-    ? (branchDeliveryFee ?? settings?.delivery_charge ?? 250)
+    ? (settings?.delivery_charge ?? 250)
     : 0;
   const total = subtotal - discount + deliveryFee;
 
@@ -100,13 +99,20 @@ export function CheckoutPage() {
   const onSubmit = async (data: CheckoutFormValues) => {
     try {
       const ordNum = generateOrderNumber();
+      let deliveryAddress = data.delivery_address || null;
+      if (data.fulfillment === 'delivery' && data.delivery_location_name) {
+        deliveryAddress = deliveryAddress
+          ? `${deliveryAddress} (${data.delivery_location_name})`
+          : data.delivery_location_name;
+      }
+
       const insertData: Record<string, unknown> = {
         order_number: ordNum,
         customer_name: data.customer_name,
         customer_email: data.customer_email || null,
         customer_phone: data.customer_phone,
         fulfillment: data.fulfillment,
-        delivery_address: data.delivery_address || null,
+        delivery_address: deliveryAddress,
         branch_id: data.branch_id || null,
         line_items: items,
         subtotal,
@@ -116,13 +122,7 @@ export function CheckoutPage() {
         coupon_code: appliedCoupon || null,
         notes: data.notes || null,
         status: 'pending',
-        estimated_prep_time: 30,
       };
-      if (data.fulfillment === 'delivery') {
-        insertData.delivery_lat = deliveryLat;
-        insertData.delivery_lng = deliveryLng;
-        insertData.delivery_location_name = data.delivery_location_name || null;
-      }
       const { data: inserted, error } = await supabase.from('orders').insert(insertData).select('id').maybeSingle();
       if (error) throw error;
       setOrderNumber(ordNum);
@@ -135,36 +135,77 @@ export function CheckoutPage() {
     }
   };
 
-  const deliveryBranches = branches?.filter((b) => b.enables_delivery ?? b.enable_delivery) ?? [];
-  const pickupBranches = branches?.filter((b) => b.enables_pickup ?? b.enable_pickup) ?? [];
+  const deliveryBranches = branches ?? [];
+  const pickupBranches = branches ?? [];
 
   if (submitted) {
     return (
       <Section className="bg-cream min-h-[70vh] flex items-center">
         <div className="container-x max-w-lg">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="card p-10 text-center"
+            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+            className="card p-10 text-center relative overflow-hidden"
           >
-            <div className="grid h-16 w-16 place-items-center rounded-full bg-success-50 text-success-600 mx-auto mb-5">
-              <CheckCircle2 className="h-8 w-8" />
-            </div>
-            <h1 className="font-heading text-3xl font-semibold text-ink-900">Order placed!</h1>
-            <p className="mt-3 text-ink-600">
-              Thank you for your order. We've received your request and will contact you shortly to confirm.
-            </p>
-            <div className="mt-6 rounded-xl bg-cream-100 p-4">
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 0.15 }}
+              className="grid h-20 w-20 place-items-center rounded-full bg-success-50 text-success-600 mx-auto mb-5 relative"
+            >
+              <CheckCircle2 className="h-10 w-10" />
+              <motion.div
+                initial={{ scale: 0, opacity: 1 }}
+                animate={{ scale: 2.5, opacity: 0 }}
+                transition={{ duration: 1.2, delay: 0.3, ease: 'easeOut' }}
+                className="absolute inset-0 rounded-full bg-success-200"
+              />
+              <motion.div
+                initial={{ scale: 0, opacity: 0.8 }}
+                animate={{ scale: 3, opacity: 0 }}
+                transition={{ duration: 1.5, delay: 0.4, ease: 'easeOut' }}
+                className="absolute inset-0 rounded-full bg-success-100"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h1 className="font-heading text-3xl font-semibold text-ink-900">Order placed!</h1>
+              <p className="mt-3 text-ink-600">
+                Thank you for your order. We've received your request and will contact you shortly to confirm.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="mt-6 rounded-xl bg-cream-100 p-4"
+            >
               <p className="text-sm text-muted">Your order number</p>
-              <p className="font-heading text-2xl font-bold text-primary mt-1">{orderNumber}</p>
-            </div>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+              <motion.p
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.5 }}
+                className="font-heading text-2xl font-bold text-primary mt-1"
+              >
+                {orderNumber}
+              </motion.p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mt-8 flex flex-col sm:flex-row gap-3 justify-center"
+            >
               {orderId && (
                 <Link to={`/track-order?id=${orderId}`} className="btn-primary">Track Your Order <ArrowRight className="h-4 w-4" /></Link>
               )}
               <Link to="/products" className="btn-outline">Continue Shopping</Link>
               <button onClick={() => navigate('/')} className="btn-outline">Back to Home</button>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </Section>
@@ -175,12 +216,37 @@ export function CheckoutPage() {
     return (
       <Section className="bg-cream min-h-[60vh] flex items-center">
         <div className="container-x max-w-md text-center">
-          <div className="grid h-20 w-20 place-items-center rounded-full bg-cream-200 mx-auto mb-5">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+            className="grid h-20 w-20 place-items-center rounded-full bg-cream-200 mx-auto mb-5"
+          >
             <ShoppingBag className="h-9 w-9 text-ink-300" />
-          </div>
-          <h1 className="font-heading text-2xl font-semibold text-ink-900">Your cart is empty</h1>
-          <p className="text-muted mt-2">Add some products before checking out.</p>
-          <Link to="/products" className="btn-primary mt-6">Browse Products <ArrowRight className="h-4 w-4" /></Link>
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="font-heading text-2xl font-semibold text-ink-900"
+          >
+            Your cart is empty
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="text-muted mt-2"
+          >
+            Add some products before checking out.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            <Link to="/products" className="btn-primary mt-6">Browse Products <ArrowRight className="h-4 w-4" /></Link>
+          </motion.div>
         </div>
       </Section>
     );
@@ -322,11 +388,15 @@ export function CheckoutPage() {
 
               {/* Items */}
               <div className="space-y-3 max-h-64 overflow-y-auto">
-                <AnimatePresence>
-                  {items.map((item) => (
+                <AnimatePresence mode="popLayout">
+                  {items.map((item, i) => (
                     <motion.div
                       key={item.product_id}
                       layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20, transition: { duration: 0.2 } }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 25, delay: i * 0.05 }}
                       className="flex gap-3 items-center"
                     >
                       <img src={item.image} alt={item.name} className="h-12 w-12 rounded-lg object-cover bg-cream-200" />

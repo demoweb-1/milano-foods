@@ -338,3 +338,31 @@ export type NewsletterSubscriber = {
   email: string;
   created_at: string;
 };
+
+export type Vacancy = {
+  id: string;
+  title: string;
+  department: string | null;
+  job_type: 'full-time' | 'part-time' | 'contract' | 'internship';
+  location: string | null;
+  description: string;
+  requirements: string | null;
+  salary_range: string | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type JobApplication = {
+  id: string;
+  vacancy_id: string | null;
+  name: string;
+  email: string;
+  phone: string;
+  cover_letter: string | null;
+  cv_url: string;
+  status: 'new' | 'reviewing' | 'shortlisted' | 'rejected' | 'hired';
+  created_at: string;
+  vacancy?: Vacancy | null;
+};
