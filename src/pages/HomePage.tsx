@@ -393,8 +393,8 @@ function Hero({
           fetchPriority="high"
           style={{ y: imageY, scale: imageScale }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-900/92 via-ink-900/70 to-ink-900/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-900/70 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-900/95 via-ink-900/80 to-ink-900/50" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-900/80 via-ink-900/20 to-transparent" />
       </div>
 
       {/* Animated floating orbs */}
